@@ -70,10 +70,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="col-7 col-lg-8">
                         <h5 class="pt-2">${product.name}</h5>
                         ${priceDisplay}
-                        <div class="size-options" style="${product.category === 'FOREveryone1L' ? 'display:none;' : ''}">
-                            <label>
-                                <input type="checkbox" class='pt-0 mt-0 small' name="size-${product.id}" value="Large"> Large <span class='text-success'>+Rp6.000</span>
-                            </label>
+                        <div class="size-options" style="${(product.category === 'FOREveryone1L' || product.category === 'ForeDeli') ? 'display:none;' : ''}">
+                          <label>
+                            <input type="checkbox" class='pt-0 mt-0 small' name="size-${product.id}" value="Large"> Large <span class='text-success'>+Rp6.000</span>
+                          </label>
                         </div>
                     </div>
                     <div class="col-2 d-flex justify-content-end align-items-end">
