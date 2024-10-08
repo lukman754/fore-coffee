@@ -275,7 +275,7 @@ const products = [{
     image: "https://static.fore.coffee/product/Chicken%20Teriyaki%20Sandwich.png"
   }, {
     id: 36,
-    name: "Smoked Beef & Cheese Sandwich",
+    name: "Smoked Beef Cheese Sandwich",
     price: 19500,
     originalPrice: 39000,
     category: "ForeDeli",
@@ -317,7 +317,7 @@ const products = [{
     image: "https://static.fore.coffee/product/beef%20bpp.jpg"
   }, {
     id: 42,
-    name: "Smoked Beef & Cheese Croissant",
+    name: "Smoked Beef Cheese Croissant",
     price: 18000,
     originalPrice: 36000,
     category: "ForeDeli",
@@ -408,7 +408,7 @@ const products = [{
     image: "https://static.fore.coffee/product/butterscotch.jpg"
   }, {
     id: 55,
-    name: "Iced Vanilla O' Crumbs",
+    name: "Iced Vanilla O Crumbs",
     price: 14500,
     originalPrice: 29000,
     category: "ForeJunior",
