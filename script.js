@@ -98,13 +98,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 addToCart(productId);
 
                 // Menampilkan pilihan ukuran saat tombol diklik
-                const sizeOptions = this.closest('.product').querySelector('.size-options');
-                if (sizeOptions) {
-                    const checkbox = sizeOptions.querySelector('input[type="checkbox"]');
-                    if (checkbox) {
-                        checkbox.checked = !checkbox.checked; // Toggle checkbox saat tombol diklik
-                    }
-                }
+                // const sizeOptions = this.closest('.product').querySelector('.size-options');
+                // if (sizeOptions) {
+                //    const checkbox = sizeOptions.querySelector('input[type="checkbox"]');
+                //    if (checkbox) {
+                //        checkbox.checked = !checkbox.checked; // Toggle checkbox saat tombol diklik
+                //    }
+                // }
 
                 // Menangani perubahan ukuran dan memperbarui harga jika perlu
                 const checkboxes = this.closest('.product').querySelectorAll('input[type="checkbox"]');
@@ -112,9 +112,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     checkbox.addEventListener('change', function () {
                         let adjustedPrice = products.find(product => product.id === productId).price;
                         if (this.checked) {
-                            adjustedPrice += 6000; // Tambahkan biaya untuk ukuran Large
+                            adjustedPrice += 3000; // Tambahkan biaya untuk ukuran Large
                         } else {
-                            adjustedPrice -= 6000; // Kembali ke harga normal jika unchecked
+                            adjustedPrice -= 3000; // Kembali ke harga normal jika unchecked
                         }
                         // Anda bisa menambahkan logika untuk memperbarui harga di tampilan produk jika diperlukan
                         console.log(`Harga untuk ${this.value}: ${formatRupiah(adjustedPrice)}`);
