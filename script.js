@@ -131,78 +131,84 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     function addToCart(productId) {
-        const product = products.find(p => p.id === productId);
-        const cartItem = cart.find(item => item.id === productId);
+    const product = products.find(p => p.id === productId);
+    
+    // Ambil ukuran yang dipilih
+    const sizeOptions = document.querySelector(`input[name="size-${productId}"]:checked`);
+    const selectedSize = sizeOptions ? sizeOptions.value : "Regular";
 
-        // Ambil ukuran yang dipilih
-        const sizeOptions = document.querySelector(`input[name="size-${productId}"]:checked`);
-        const selectedSize = sizeOptions ? sizeOptions.value : "Regular";
+    // Hitung harga sesuai ukuran
+    const price = (selectedSize === "Large" && product.category !== "FOREveryone1L") ? product.price + 6000 : product.price;
+    
+    // Cari produk di keranjang berdasarkan id dan ukuran
+    const cartItem = cart.find(item => item.id === productId && item.size === selectedSize);
 
-        // Hitung harga sesuai ukuran
-        const price = (selectedSize === "Large" && product.category !== "FOREveryone1L") ? product.price + 6000 : product.price;
-
-        if (cartItem) {
-            cartItem.quantity += 1;
-            cartItem.price = price; // Update harga di keranjang
-        } else {
-            cart.push({
-                ...product,
-                quantity: 1,
-                price: price // Set harga sesuai ukuran
-            });
-        }
-
-        updateCart();
+    if (cartItem) {
+        // Jika produk dengan ukuran yang sama sudah ada di keranjang, tambahkan kuantitas
+        cartItem.quantity += 1;
+    } else {
+        // Tambahkan produk baru ke keranjang dengan ukuran yang dipilih
+        cart.push({
+            ...product,
+            quantity: 1,
+            price: price,
+            size: selectedSize // Tambahkan ukuran ke objek produk di keranjang
+        });
     }
 
+    updateCart();
+}
 
-    function updateCart() {
-        const cartDiv = document.getElementById("cart");
-        cartDiv.innerHTML = "";
-        let total = 0;
-        let totalQuantity = 0;
+function updateCart() {
+    const cartDiv = document.getElementById("cart");
+    cartDiv.innerHTML = "";
+    let total = 0;
+    let totalQuantity = 0;
 
-        // Hitung total harga produk
-        cart.forEach((item, index) => {
-            const itemTotal = item.price * item.quantity;
-            total += itemTotal;
-            totalQuantity += item.quantity;
-            cartDiv.innerHTML += `
-                <div class='row mb-1'>
-                    <div class='col-7'>${item.name}</div>
-                    <div class='col-1'>${item.quantity}x</div>
-                    <div class='col-2'>${formatRupiah(itemTotal)}</div>
-                    <div class='col-2 d-flex justify-content-end'>
-                        <a class="remove-item text-danger rounded-pill btn-sm" data-index="${index}">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    </div>
-                </div>`;
+    // Hitung total harga produk
+    cart.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        totalQuantity += item.quantity;
+
+        // Tampilkan ukuran di keranjang jika "Large"
+        const sizeLabel = item.size === "Large" ? " (L)" : "";
+
+        cartDiv.innerHTML += `
+            <div class='row mb-1'>
+                <div class='col-7'>${item.name}${sizeLabel}</div>
+                <div class='col-1'>${item.quantity}x</div>
+                <div class='col-2'>${formatRupiah(itemTotal)}</div>
+                <div class='col-2 d-flex justify-content-end'>
+                    <a class="remove-item text-danger rounded-pill btn-sm" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            </div>`;
+    });
+
+    // Hitung fee admin 10%
+    const adminFee = total * 0.10;
+    const totalWithFee = total + adminFee;
+
+    // Update total di elemen dengan fee admin
+    document.getElementById("total").innerText = formatRupiah(totalWithFee);
+
+    // Tampilkan jumlah produk di bubble
+    document.getElementById("cart-count").innerText = totalQuantity;
+
+    // Tambahkan event listener untuk tombol hapus
+    const removeButtons = document.querySelectorAll(".remove-item");
+    removeButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            const index = parseInt(this.getAttribute("data-index"));
+            removeFromCart(index);
         });
+    });
 
-        // Hitung fee admin 10%
-        const adminFee = total * 0.10;
-        const totalWithFee = total + adminFee;
-
-        // Update total di elemen dengan fee admin
-        document.getElementById("total").innerText = formatRupiah(totalWithFee);
-
-        // Tampilkan jumlah produk di bubble
-        document.getElementById("cart-count").innerText = totalQuantity;
-
-        // Tambahkan event listener untuk tombol hapus
-        const removeButtons = document.querySelectorAll(".remove-item");
-        removeButtons.forEach(button => {
-            button.addEventListener("click", function () {
-                const index = parseInt(this.getAttribute("data-index"));
-                removeFromCart(index);
-            });
-        });
-
-        // Tampilkan fee admin secara terpisah jika diinginkan
-        document.getElementById("admin-fee").innerText = `Fee Admin (10%): ${formatRupiah(adminFee)}`;
-    }
-
+    // Tampilkan fee admin secara terpisah jika diinginkan
+    document.getElementById("admin-fee").innerText = `Fee Admin (10%): ${formatRupiah(adminFee)}`;
+}
 
     function removeFromCart(index) {
         cart.splice(index, 1); // Hapus item dari keranjang
