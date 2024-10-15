@@ -274,35 +274,40 @@ function updateCart() {
     });
 
     function sendWhatsAppMessage(name, location) {
-        const message = cart.map(item => `${item.name} - ${item.quantity}x ${formatRupiah(item.price)}`).join('%0A');
-        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const adminFee = total * 0.10;
-        const totalWithFee = total + adminFee;
-        const finalMessage = `Nama: ${name}%0ALokasi Fore: ${location}%0A%0A${message}%0A%0ATotal: ${formatRupiah(totalWithFee)}`;
-        const phoneNumber = "6285156477250"; // Ganti dengan nomor WhatsApp yang dituju
-        const url = `https://wa.me/${phoneNumber}?text=${finalMessage}`;
-        window.open(url, '_blank');
-    }
+    const message = cart.map(item => {
+        // Tambahkan "(L)" jika ukuran produk adalah "Large"
+        const sizeLabel = item.size === "Large" ? " (L)" : "";
+        return `${item.name}${sizeLabel} - ${item.quantity}x ${formatRupiah(item.price)}`;
+    }).join('%0A');
 
-    document.getElementById("order-form").addEventListener("submit", function (event) {
-        event.preventDefault(); // Mencegah pengiriman form
-        const name = document.getElementById("name").value;
-        const location = document.getElementById("location").value;
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const adminFee = total * 0.10;
+    const totalWithFee = total + adminFee;
+    const finalMessage = `Nama: ${name}%0ALokasi Fore: ${location}%0A%0A${message}%0A%0ATotal: ${formatRupiah(totalWithFee)}`;
+    const phoneNumber = "6285156477250"; // Ganti dengan nomor WhatsApp yang dituju
+    const url = `https://wa.me/${phoneNumber}?text=${finalMessage}`;
+    window.open(url, '_blank');
+}
 
-        // Mengirim pesan ke WhatsApp
-        sendWhatsAppMessage(name, location);
+document.getElementById("order-form").addEventListener("submit", function (event) {
+    event.preventDefault(); // Mencegah pengiriman form
+    const name = document.getElementById("name").value;
+    const location = document.getElementById("location").value;
 
-        // Mengosongkan keranjang tetapi tidak mereset input name dan location
-        cart = [];
-        updateCart();
+    // Mengirim pesan ke WhatsApp
+    sendWhatsAppMessage(name, location);
 
-        // Reset form kecuali input name dan location
-        document.querySelectorAll("#order-form input").forEach(input => {
-            if (input.id !== "name" && input.id !== "location") {
-                input.value = '';
-            }
-        });
+    // Mengosongkan keranjang tetapi tidak mereset input name dan location
+    cart = [];
+    updateCart();
+
+    // Reset form kecuali input name dan location
+    document.querySelectorAll("#order-form input").forEach(input => {
+        if (input.id !== "name" && input.id !== "location") {
+            input.value = '';
+        }
     });
+});
 
 
     // Menampilkan semua produk saat halaman dimuat
