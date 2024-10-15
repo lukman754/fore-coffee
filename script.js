@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const adminFee = total * 0.10;
         const totalWithFee = total + adminFee;
-        const finalMessage = `Nama: ${name}%0ALokasi Tomoro: ${location}%0A%0A${message}%0A%0ATotal: ${formatRupiah(totalWithFee)}`;
+        const finalMessage = `Nama: ${name}%0ALokasi Fore: ${location}%0A%0A${message}%0A%0ATotal: ${formatRupiah(totalWithFee)}`;
         const phoneNumber = "6285156477250"; // Ganti dengan nomor WhatsApp yang dituju
         const url = `https://wa.me/${phoneNumber}?text=${finalMessage}`;
         window.open(url, '_blank');
