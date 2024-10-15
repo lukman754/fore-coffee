@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         ${priceDisplay}
                         <div class="size-options" style="${(product.category === 'FOREveryone1L' || product.category === 'ForeDeli') ? 'display:none;' : ''}">
                           <label>
-                            <input type="checkbox" class='pt-0 mt-0 small' name="size-${product.id}" value="Large"> Large <span class='text-success'>+Rp6.000</span>
+                            <input type="checkbox" class='pt-0 mt-0 small' name="size-${product.id}" value="Large"> Large <span class='text-success'>+Rp3.000</span>
                           </label>
                         </div>
                     </div>
