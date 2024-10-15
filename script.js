@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const selectedSize = sizeOptions ? sizeOptions.value : "Regular";
 
     // Hitung harga sesuai ukuran
-    const price = (selectedSize === "Large" && product.category !== "FOREveryone1L") ? product.price + 6000 : product.price;
+    const price = (selectedSize === "Large" && product.category !== "FOREveryone1L") ? product.price + 3000 : product.price;
     
     // Cari produk di keranjang berdasarkan id dan ukuran
     const cartItem = cart.find(item => item.id === productId && item.size === selectedSize);
