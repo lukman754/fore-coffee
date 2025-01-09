@@ -11,6 +11,8 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
   </script>
   <script src="https://kit.fontawesome.com/8c8ccf764d.js" crossorigin="anonymous"></script>
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.0/qrcode.min.js"></script>
 
   <script src="product.js"></script>
   <link rel="icon" href="icon.png">
@@ -129,14 +131,49 @@
 
   <aside class="container bg-dark rounded-top text-white">
     <div class="cart p-2 mt-4 rounded small">
-      <h4 class="pt-2">Keranjang</h4>
-      <div class="w-100 bg-transparent p-2 mb-3 pb-0" id="cart"></div>
-      <p class="float-end" id="admin-fee"></p>
+      
+      <div class="row">
+        <div class="col-md-9">
+          <h4 class="pt-2">Keranjang</h4>
+          <div class="w-100 bg-transparent p-2 mb-3 pb-0" id="cart"></div>
+          <p class="float-end" id="admin-fee"></p>
 
-      <p class="bg-secondary text-white p-2 rounded float-end w-100 mt-1 rounded d-flex justify-content-between">
-        <span>Total :</span>
-        <span id="total">Rp0</span>
-      </p>
+          <p class="bg-secondary text-white p-2 rounded float-end w-100 mt-1 rounded d-flex justify-content-between">
+            <span>Total :</span>
+            <span id="total">Rp0</span>
+          </p>
+        </div>     
+        <div class="col-md-3">
+          <h6 class="pt-2">Scan QRIS dibawah untuk pembayaran</h6>
+              <div class="w-100 h-100" id="qrcode">QRIS</div>
+        </div>
+      </div>
+
+      <!-- Hidden inputs -->
+      <div style="display: none;">
+          <div class="form-group">
+              <label for="nominalInput">Nominal Pembayaran</label>
+              <input
+                  type="number"
+                  id="nominalInput"
+                  placeholder="Masukkan nominal pembayaran"
+                  min="1"
+              />
+          </div>
+          <div class="form-group">
+              <label for="qrisInput">QRIS Static Code</label>
+              <input
+                  type="text"
+                  id="qrisInput"
+                  value="00020101021126690021ID.CO.BANKMANDIRI.WWW01189360000801178300070211711783000730303UKE51440014ID.CO.QRIS.WWW0215ID10232654103820303UKE5204274153033605802ID5908LM Store6015Tangerang (Kab)61051582062070703A0163040C26"
+              />
+          </div>
+          <div class="button-container">
+              <button onclick="generateQRIS()">Generate QRIS</button>
+            </div>
+      </div>
+
+            
 
 
 
@@ -161,6 +198,109 @@
 
   </div>
   <script src="script.js"></script>
+   <script>
+      // Function to update input value and generate QR whenever total changes
+      function syncTotalAndGenerateQR() {
+          const totalElement = document.getElementById('total');
+          const inputElement = document.getElementById('nominalInput');
+          
+          // Create a MutationObserver to watch for changes in the total element
+          const observer = new MutationObserver(function(mutations) {
+              mutations.forEach(function(mutation) {
+                  // Extract number from total (remove 'Rp' and any non-digit characters)
+                  const totalValue = mutation.target.textContent.replace('Rp', '').replace(/\D/g, '');
+                  // Update input value
+                  inputElement.value = totalValue;
+                  // Generate QR code automatically
+                  if (totalValue > 0) {
+                      generateQRIS();
+                  }
+              });
+          });
+
+          // Configuration for the observer (watch for changes in text content)
+          const config = { characterData: true, childList: true, subtree: true };
+          
+          // Start observing the total element
+          observer.observe(totalElement, config);
+          
+          // Also set initial value when page loads
+          const initialValue = totalElement.textContent.replace('Rp', '').replace(/\D/g, '');
+          inputElement.value = initialValue;
+          if (initialValue > 0) {
+              generateQRIS();
+          }
+      }
+
+      function pad(number) {
+          return number < 10 ? "0" + number : number.toString();
+      }
+
+      function toCRC16(input) {
+          let crc = 0xffff;
+          for (let i = 0; i < input.length; i++) {
+              crc ^= input.charCodeAt(i) << 8;
+              for (let j = 0; j < 8; j++) {
+                  crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
+              }
+          }
+          let hex = (crc & 0xffff).toString(16).toUpperCase();
+          return hex.length === 3 ? "0" + hex : hex;
+      }
+
+      function makeString(qris, { nominal } = {}) {
+          if (!qris) throw new Error('The parameter "qris" is required.');
+          if (!nominal) throw new Error('The parameter "nominal" is required.');
+
+          let qrisModified = qris.slice(0, -4).replace("010211", "010212");
+          let qrisParts = qrisModified.split("5802ID");
+
+          let amount = "54" + pad(nominal.toString().length) + nominal;
+          amount += "5802ID";
+
+          let output = qrisParts[0].trim() + amount + qrisParts[1].trim();
+          output += toCRC16(output);
+
+          return output;
+      }
+
+      function generateQRIS() {
+          const qrisInput = document.getElementById("qrisInput").value.trim();
+          const nominalInput = document.getElementById("nominalInput").value.trim();
+
+          if (!qrisInput || !nominalInput || isNaN(nominalInput) || Number(nominalInput) <= 0) {
+              console.log("Waiting for valid total and QRIS input");
+              return;
+          }
+
+          const qrisDinamis = makeString(qrisInput, { nominal: nominalInput });
+          console.log("QRIS Dinamis:", qrisDinamis);
+
+          const qrcodeElement = document.getElementById("qrcode");
+          qrcodeElement.innerHTML = ""; // Clear previous QR Code
+          QRCode.toCanvas(
+            qrisDinamis,
+            { margin: 2 }, // Tidak menentukan width di sini
+            function (err, canvas) {
+              if (err) {
+                console.error("QR Code Error:", err);
+                return;
+              }
+
+              // Mengatur lebar canvas menjadi 100%
+              canvas.style.width = "100%";
+              canvas.style.height = "auto"; // Untuk menjaga aspek rasio
+
+              // Menambahkan canvas ke elemen target
+              qrcodeElement.appendChild(canvas);
+            }
+          );
+
+      }
+
+      // Initialize when DOM is fully loaded
+      document.addEventListener('DOMContentLoaded', syncTotalAndGenerateQR);
+    </script>
 </body>
 
 </html>
